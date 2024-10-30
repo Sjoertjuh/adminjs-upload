@@ -1,12 +1,13 @@
-import { DropZone, DropZoneItem, FormGroup, Label } from '@adminjs/design-system'
+import { DropZone, DropZoneItem, FormGroup, FormMessage, Label } from '@adminjs/design-system'
 import { EditPropertyProps, flat, useTranslation } from 'adminjs'
 import React, { FC, useEffect, useState } from 'react'
 import PropertyCustom from '../types/property-custom.type.js'
 
 const Edit: FC<EditPropertyProps> = ({ property, record, onChange }) => {
-  const { translateProperty } = useTranslation()
+  const { translateProperty, tm } = useTranslation()
   const { params } = record
   const { custom } = property as unknown as { custom: PropertyCustom }
+  const error = record.errors?.[property.path]
 
   const path = flat.get(params, custom.filePathProperty)
   const key = flat.get(params, custom.keyProperty)
@@ -63,7 +64,7 @@ const Edit: FC<EditPropertyProps> = ({ property, record, onChange }) => {
   }
 
   return (
-    <FormGroup>
+    <FormGroup error={Boolean(error)}>
       <Label>{translateProperty(property.label, property.resourceId)}</Label>
       <DropZone
         onChange={onUpload}
@@ -96,6 +97,7 @@ const Edit: FC<EditPropertyProps> = ({ property, record, onChange }) => {
           })}
         </>
       ) : ''}
+      <FormMessage>{error && tm(error.message, property.resourceId)}</FormMessage>
     </FormGroup>
   )
 }
